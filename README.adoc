@@ -1,0 +1,6 @@
+= Doc as Test for Rust
+
+This approach use https://approvaltests.com/[Approvals Testing].
+
+You can find an implementation of https://approvaltests.com/[Approvals Testing] for Rust here: https://github.com/aleksandrpak/approvals.
+

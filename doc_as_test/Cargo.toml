@@ -1,0 +1,11 @@
+[package]
+name = "doc_as_test"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+approvals = "0.0.7"
+doc_as_test_derive = { path = "../doc_as_test_derive" }
+backtrace = "0.1"
