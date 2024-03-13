@@ -1,4 +1,3 @@
-extern crate backtrace;
 use std::fs;
 use std::path::Path;
 
@@ -89,33 +88,23 @@ mod tests {
 
     use doc_as_test_derive::doc_as_test;
 
-    /// Using lib approvals
-    /// https://github.com/aleksandrpak/approvals
-    #[test]
-    fn my_test_approvals_xxx() {
-        let mut doc = format!("= {}\n\n", "Using Approvals");
-        doc.push_str("xy");
-        doc.push('z');
-
-        approvals::approve(&doc);
-    }
-
     /// Using DocAsTest
     #[test]
-    fn my_test_approvals_with_doc_as_test() {
-        let mut doc = DocAsTest::new("Using DocAsTest", "my_test_approvals_with_doc_as_test");
-        doc.write("x");
-        doc.write("y");
-        doc.write("z");
+    fn basic_usage() {
+        let mut doc = DocAsTest::new("Using DocAsTest", "doc_as_test::basic_usage");
+        doc.write("xyz");
 
         doc.approve();
     }
 
+    #[doc_as_test()]
+    fn using_macro_without_title() {
+        doc.write("xyz");
+    }
+
     // Using DocAsTest macro
-    #[doc_as_test(Using DocAsTest macro)]
-    fn my_test_approvals_with_macro() {
-        doc.write("x");
-        doc.write("y");
-        doc.write("z");
+    #[doc_as_test(title = "Using DocAsTest macro specifing a title")]
+    fn using_macro_with_a_title() {
+        doc.write("xyz");
     }
 }
