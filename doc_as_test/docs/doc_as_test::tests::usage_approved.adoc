@@ -1,0 +1,25 @@
+= Usage
+
+:source-highlighter: highlight.js
+
+This module allow you to create DocAsTest tests.
+
+Here a simple usage example:
+
+.Source code
+[source,rust,indent=0]
+----
+    #[doc_as_test()]
+    fn sample_doc_as_test_usage() {
+        doc.write("xyz");
+    }
+
+----
+
+.Approved file (./docs/doc_as_test::tests::sample_doc_as_test_usage_approved.adoc)
+[source,asciidoc]
+----
+= Sample doc as test usage
+
+xyz
+----

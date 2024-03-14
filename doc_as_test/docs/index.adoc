@@ -1,0 +1,9 @@
+= Doc as Test
+:toc: left
+:doc_as_test: https://sfauvel.github.io/documentationtesting/[Doc as test]
+
+`{doc_as_test}` is a documentation-centric approach where documentation serves as an expected value for testing.
+
+This crate helps implement this approach in `Rust`.
+
+include::doc_as_test::tests::usage_approved.adoc[leveloffset=+1]

@@ -24,20 +24,21 @@ impl DocAsTest {
         self.content.push_str(content);
     }
 
+    pub fn title(&self) -> String {
+        let mut c = self.name.chars();
+        match c.next() {
+            None => String::new(),
+            Some(f) => f.to_uppercase().collect::<String>() + &c.as_str().replace('_', " "),
+        }
+    }
+
     pub fn content(&self) -> String {
-        format!("= {}\n\n{}", self.name, self.content).to_string()
+        format!("= {}\n\n{}", self.title(), self.content).to_string()
     }
 
     pub fn approve(&self) {
-        let method_name = &self.test_name;
-        let received_filename = format!(
-            "{}/{}_received.{}",
-            &self.docs_path, method_name, self.docs_extension
-        );
-        let approved_filename = format!(
-            "{}/{}_approved.{}",
-            self.docs_path, method_name, self.docs_extension
-        );
+        let received_filename = self.received_filename();
+        let approved_filename = self.approved_filename();
         // println!("received_filename {}", received_filename);
         // println!("approved_filename {}", approved_filename);
 
@@ -71,6 +72,22 @@ impl DocAsTest {
         panic!("Strings are not identical");
     }
 
+    fn received_filename(&self) -> String {
+        let method_name = &self.test_name;
+        format!(
+            "{}/{}_received.{}",
+            &self.docs_path, method_name, self.docs_extension
+        )
+    }
+
+    fn approved_filename(&self) -> String {
+        let method_name = &self.test_name;
+        format!(
+            "{}/{}_approved.{}",
+            &self.docs_path, method_name, self.docs_extension
+        )
+    }
+
     fn get_file_contents(&self, filename: &str) -> String {
         if Path::new(filename).exists() {
             fs::read_to_string(filename)
@@ -87,24 +104,78 @@ mod tests {
     use super::*;
 
     use doc_as_test_derive::doc_as_test;
+    use toml::Table;
 
     /// Using DocAsTest
     #[test]
     fn basic_usage() {
-        let mut doc = DocAsTest::new("Using DocAsTest", "doc_as_test::basic_usage");
+        let mut doc = DocAsTest::new("Using DocAsTest", "doc_as_test::tests::basic_usage");
         doc.write("xyz");
 
         doc.approve();
     }
-
+    // >>> minimal_example
     #[doc_as_test()]
-    fn using_macro_without_title() {
+    fn sample_doc_as_test_usage() {
         doc.write("xyz");
     }
+    // <<< minimal_example
 
     // Using DocAsTest macro
     #[doc_as_test(title = "Using DocAsTest macro specifing a title")]
     fn using_macro_with_a_title() {
         doc.write("xyz");
+    }
+
+    #[doc_as_test()]
+    fn usage() {
+        doc.write(":source-highlighter: highlight.js\n");
+        doc.write("\n");
+        doc.write("This module allow you to create DocAsTest tests.\n");
+        doc.write("\n");
+        doc.write("Here a simple usage example:\n");
+
+        let file_path = format!("./Cargo.toml");
+        let contents =
+            fs::read_to_string(file_path).expect("Should have been able to read the file");
+        let value = contents.parse::<Table>().unwrap();
+        let crate_name = &value["package"]
+            .get("name")
+            .map(|v| v.as_str().unwrap())
+            .unwrap();
+        let filename = file!().to_string().replace(&format!("{crate_name}/"), "");
+        let code = extract_file_part(&filename, "minimal_example");
+        doc.write("\n.Source code\n[source,rust,indent=0]\n----\n");
+        doc.write(&code);
+        doc.write("\n----\n");
+        doc.write("\n");
+
+        let approved_filename =
+            DocAsTest::new("", "doc_as_test::tests::sample_doc_as_test_usage").approved_filename();
+        println!(">>> {}", approved_filename);
+        let approved_file_content = fs::read_to_string(&approved_filename).unwrap();
+        doc.write(&format!(".Approved file ({approved_filename})\n"));
+        doc.write("[source,asciidoc]\n----\n");
+        doc.write(&approved_file_content);
+        doc.write("\n----\n");
+    }
+
+    fn extract_file_part(filename: &str, tag: &str) -> String {
+        let code = std::fs::read_to_string(filename).unwrap();
+        let lines = code.split('\n');
+        let mut lines = lines
+            .into_iter()
+            .skip_while(|line| !line.contains(&format!("// >>> {tag}")));
+        lines.next();
+        let mut code_part = String::new();
+        while let Some(line) = lines.next() {
+            if line.contains(&format!("// <<< {tag}")) {
+                break;
+            }
+
+            code_part.push_str(&format!("{}\n", line));
+        }
+
+        code_part
     }
 }

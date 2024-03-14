@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 doc_as_test_derive = { path = "../doc_as_test_derive" }
+toml = "0.8.10"

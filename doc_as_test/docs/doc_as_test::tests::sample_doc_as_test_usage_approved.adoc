@@ -1,0 +1,3 @@
+= Sample doc as test usage
+
+xyz
