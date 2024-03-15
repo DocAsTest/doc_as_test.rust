@@ -61,14 +61,13 @@ impl DocAsTest {
             return;
         }
 
-        self.show_diff(&expected_content, &current_content);
-
         if let Err(err) = fs::write(&received_filename, &current_content) {
             panic!("Failed to write current file contents: {}", err);
         }
 
+        let (message, line) = self.extract_diff(&expected_content, &current_content);
         panic!(
-            "Expecting content of file {approved_filename} but got the one in {received_filename}.\n",
+            "Expecting content of file {approved_filename}:{line} but got the one in {received_filename}:{line}\n{message}",
         );
     }
 
@@ -98,10 +97,37 @@ impl DocAsTest {
         }
     }
 
-    fn show_diff(&self, expected_content: &str, current_content: &str) {
-        // TODO Display only the first different line with number
-        println!("Expected: {}\n", expected_content);
-        println!("Current: {}\n", current_content);
+    fn extract_diff(&self, left_content: &str, right_content: &str) -> (String, u32) {
+        let mut line: u32 = 0;
+        let mut left_lines = left_content.split('\n');
+        let mut right_lines = right_content.split('\n');
+
+        loop {
+            match (left_lines.next(), right_lines.next()) {
+                (Some(left), Some(right)) => {
+                    line += 1;
+                    if left != right {
+                        return (
+                            format!("Line {line}:\n    left : {left}\n    right: {right}"),
+                            line,
+                        );
+                    };
+                }
+                (None, Some(_)) => {
+                    return (
+                        format!("Right is greater than left from line {}.", line + 1),
+                        line,
+                    );
+                }
+                (Some(_), None) => {
+                    return (
+                        format!("Left is greater than right from line {}.", line + 1),
+                        line,
+                    );
+                }
+                (None, None) => return (String::new(), line),
+            }
+        }
     }
 }
 
@@ -183,5 +209,38 @@ mod tests {
         }
 
         code_part
+    }
+
+    #[doc_as_test]
+    fn extract_diff() {
+        let left = "ABC\nDEF";
+        let right = "ABC\nGHI";
+        let (diff, line) = doc.extract_diff(left, right);
+
+        doc.write(&format!(".Left\n----\n{left}\n----\n"));
+        doc.write("\n");
+        doc.write(&format!(".Right\n----\n{right}\n----\n"));
+        doc.write("\n");
+        doc.write(&format!(".Diff\n----\n{diff}\n----\n"));
+    }
+
+    #[doc_as_test]
+    fn extract_diff_when_one_is_longer() {
+        let shortest = "ABC\nDEF";
+        let longest = "ABC\nDEF\nGHI";
+
+        doc.write(&format!(".Shortest\n----\n{shortest}\n----\n"));
+        doc.write("\n");
+        doc.write(&format!(".Longest\n----\n{longest}\n----\n"));
+        doc.write("\n");
+        let (diff, line) = doc.extract_diff(shortest, longest);
+        doc.write(&format!(
+            ".With right the longest one.\n----\n{diff}\n----\n"
+        ));
+        doc.write("\n");
+        let (diff, line) = doc.extract_diff(longest, shortest);
+        doc.write(&format!(
+            ".With left the longest one.\n----\n{diff}\n----\n"
+        ));
     }
 }

@@ -1,0 +1,20 @@
+= Extract diff
+
+.Left
+----
+ABC
+DEF
+----
+
+.Right
+----
+ABC
+GHI
+----
+
+.Diff
+----
+Line 2:
+    left : DEF
+    right: GHI
+----
