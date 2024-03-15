@@ -61,15 +61,15 @@ impl DocAsTest {
             return;
         }
 
-        // println!("Expected: {}\n", expected_content);
-        // println!("Current: {}\n", current_content);
+        self.show_diff(&expected_content, &current_content);
 
-        if let Err(err) = fs::write(received_filename, current_content) {
+        if let Err(err) = fs::write(&received_filename, &current_content) {
             panic!("Failed to write current file contents: {}", err);
         }
-        // launch_diff(command, &method_name, approvals_dir); // TODO: Show how to diff yourself
 
-        panic!("Strings are not identical");
+        panic!(
+            "Expecting content of file {approved_filename} but got the one in {received_filename}.\n",
+        );
     }
 
     fn received_filename(&self) -> String {
@@ -96,6 +96,12 @@ impl DocAsTest {
         } else {
             "".to_string()
         }
+    }
+
+    fn show_diff(&self, expected_content: &str, current_content: &str) {
+        // TODO Display only the first different line with number
+        println!("Expected: {}\n", expected_content);
+        println!("Current: {}\n", current_content);
     }
 }
 

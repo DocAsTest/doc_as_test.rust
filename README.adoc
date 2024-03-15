@@ -1,6 +1,20 @@
-= Doc as Test for Rust
+= Doc as Test
+:toc: left
+:doc_as_test: https://sfauvel.github.io/documentationtesting/[Doc as test]
+:approvals_testing: https://approvaltests.com/[Approvals Testing]
 
-This approach use https://approvaltests.com/[Approvals Testing].
+`{doc_as_test}` is a documentation-centric approach where documentation serves as an expected value for testing.
 
-You can find an implementation of https://approvaltests.com/[Approvals Testing] for Rust here: https://github.com/aleksandrpak/approvals.
+This crate helps implement this approach in `Rust`.
+
+Source code is available in https://github.com/DocAsTest/doc_as_test.rust[DocAsTest/doc_as_test.rust] github repository.
+
+include::doc_as_test/docs/doc_as_test::tests::usage_approved.adoc[leveloffset=+1]
+
+
+== References
+
+This approach is based on {approvals_testing}.
+
+You can find an {approvals_testing} implementation for Rust in this Github repository: https://github.com/aleksandrpak/approvals. 
 
