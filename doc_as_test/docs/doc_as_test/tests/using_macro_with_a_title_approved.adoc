@@ -1,3 +1,0 @@
-= Using DocAsTest macro specifing a title
-
-xyz
