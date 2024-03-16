@@ -9,7 +9,7 @@ This crate helps implement this approach in `Rust`.
 
 Source code is available in https://github.com/DocAsTest/doc_as_test.rust[DocAsTest/doc_as_test.rust] github repository.
 
-include::doc_as_test/docs/doc_as_test::tests::usage_approved.adoc[leveloffset=+1]
+include::doc_as_test/docs/doc_as_test/tests/usage_approved.adoc[leveloffset=+1]
 
 
 == References

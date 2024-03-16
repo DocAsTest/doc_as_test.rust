@@ -1,6 +1,5 @@
 use std::fs;
 use std::path::Path;
-
 pub struct DocAsTest {
     name: String,
     test_name: String,
@@ -39,6 +38,8 @@ impl DocAsTest {
     pub fn approve(&self) {
         let received_filename = self.received_filename();
         let approved_filename = self.approved_filename();
+
+        fs::create_dir_all(Path::new(&approved_filename).parent().unwrap()).unwrap();
         // println!("received_filename {}", received_filename);
         // println!("approved_filename {}", approved_filename);
 
@@ -72,7 +73,7 @@ impl DocAsTest {
     }
 
     fn received_filename(&self) -> String {
-        let method_name = &self.test_name;
+        let method_name = &self.test_name.replace("::", "/");
         format!(
             "{}/{}_received.{}",
             &self.docs_path, method_name, self.docs_extension
@@ -80,7 +81,7 @@ impl DocAsTest {
     }
 
     fn approved_filename(&self) -> String {
-        let method_name = &self.test_name;
+        let method_name = &self.test_name.replace("::", "/");
         format!(
             "{}/{}_approved.{}",
             &self.docs_path, method_name, self.docs_extension
